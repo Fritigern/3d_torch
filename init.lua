@@ -89,7 +89,14 @@ minetest.register_node("3d_torch:torch_ceiling",{
 
 --the torch wall
 minetest.register_node("3d_torch:torch_wall",{
-	tiles = {"3d_torch_torch_top.png","3d_torch_torch_top.png","3d_torch_torch_1.png","3d_torch_torch_1.png","3d_torch_torch_2.png","3d_torch_torch.png"},
+	tiles = {
+	"3d_torch_torch_top.png",
+	"3d_torch_torch_top.png",
+	{name="3d_tprch_torch_on_floor_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	{name="3d_tprch_torch_on_floor_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	{name="3d_torch_torch_right_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	{name="3d_torch_torch_left_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	},
 	inventory_image = "default_torch_on_floor.png",
 	wield_image = "default_torch_on_floor.png",
 	light_source = LIGHT_MAX-1,
