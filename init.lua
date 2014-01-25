@@ -3,58 +3,112 @@
 -- found  here https://forum.minetest.net/viewtopic.php?id=2840 --
 
 -- code by Semmett9 / Infinitum --
+-- torch rotation by addi --
 
-minetest.register_on_placenode(function (pos, newnode, placer, oldnode, itemstack)
-	
-	pos.y = pos.y+1
-	local nodeover = minetest.env:get_node(pos)
-	local name2 = nodeover.name
-	pos.y = pos.y-2
-	local nodeunder = minetest.env:get_node(pos)
-	local name = nodeunder.name
-	
-	if name ~= "air" and newnode.name == "default:torch" then
-		if name ~= "3d_torch:torch_floor" and name ~= "default:torch" then
-		pos.y = pos.y+1
-		minetest.env:remove_node(pos)
-		pos.y = pos.y+1
-		minetest.env:place_node(pos, {name="3d_torch:torch_floor"})
-		return
-		end
-	end
-	
-	-- this is for the torches to be on the roof --
-	-- this is removed because its silly 
-	
-	--if name2 ~= "air" and newnode.name == "default:torch" then
-	--	if name2 ~= "default:torch" then
-	--	if name2 ~= "3d_torch:torch_ceiling" then
-	--	if name == "air" or name == "default:torch" or name == "3d_torch:torch_floor"then
-	--	pos.y = pos.y+1
-	--	minetest.env:remove_node(pos)
-	--	pos.y = pos.y+1
-	--	minetest.env:place_node(pos, {name="3d_torch:torch_ceiling"})
-	--	return
-	--	end
-	--	end
-	--	end
-	--end
+
+local function placeTorch(itemstack, placer, pointed_thing)
+			if pointed_thing.type ~= "node" then
+				return itemstack
+			end
+
+			local p0 = pointed_thing.under
+			local p1 = pointed_thing.above
+			local param2 = 0
+
+			local dir = {
+				x = p1.x - p0.x,
+				y = p1.y - p0.y,
+				z = p1.z - p0.z
+			}
+			param2 = minetest.dir_to_facedir(dir,false)
+			local correct_rotation={
+				[0]=3,
+				[1]=0,
+				[2]=1,
+				[3]=2
+			}
+			if p0.y>p1.y then
+			--place torch on ceiling
+			minetest.add_node(p1, {name="3d_torch:torch_ceiling"})
+			elseif p0.y<p1.y then
+			--place torch on floor
+			minetest.add_node(p1, {name="3d_torch:torch_floor"})
+			else
+			--place torch on wall
+			minetest.add_node(p1, {name="3d_torch:torch_wall",param2=correct_rotation[param2]})
+			--return minetest.item_place(itemstack, placer, pointed_thing, param2)
+			end
+			itemstack:take_item()
+			return itemstack
+						
 end
-)
 
-
-minetest.register_node("3d_torch:torch_wall",{
-	tiles = {"3d_torch_torch_top.png","3d_torch_torch_top.png","3d_torch_torch_1.png","3d_torch_torch_1.png","3d_torch_torch_2.png","3d_torch_torch.png"},
+minetest.register_node("3d_torch:torch_ceiling",{
+	tiles = {
+	"3d_torch_torch_top.png",
+	"3d_torch_torch_top.png",
+	{ name="3d_tprch_torch_on_floor_animated.png",
+				animation={
+					type="vertical_frames",
+					aspect_w=40,
+					aspect_h=40,
+					length=1.0
+					}
+				}
+			},
+	
 	inventory_image = "default_torch_on_floor.png",
 	wield_image = "default_torch_on_floor.png",
-	light_source = 30,
+	light_source = LIGHT_MAX-1,
 	is_ground_content = true,
 	walkable = false,
 	sunlight_propagates = true,
 	drawtype="nodebox",
 	paramtype = "light",
+	on_place = placeTorch,
+	groups = {choppy=2,dig_immediate=3,flammable=1,hot=2}, 
+	drop = 'default:torch',
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.0696325,-0.5,-0.0638297,0.0638297,0.124758,0.0696325}, --NodeBox1
+			{-0.336557,-0.0667312,0.0698737,0.301741,0.5,0.0698737}, --NodeBox2
+			{-0.336557,-0.0725339,-0.0693932,0.307544,0.5,-0.0693932}, --NodeBox3
+			{0.0522243,-0.0841393,-0.31311,0.0522243,0.5,0.307788}, --NodeBox4
+			{-0.0696325,-0.0783366,-0.318913,-0.0696325,0.5,0.296182}, --NodeBox5
+		},
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+		{-0.0696325,-0.5,-0.0638297,0.0638297,0.5,0.0696325}, --NodeBox1
+		},
+	},
+	sounds = default.node_sound_defaults(),
+})
+
+--the torch wall
+minetest.register_node("3d_torch:torch_wall",{
+	tiles = {
+	"3d_torch_torch_top.png",
+	"3d_torch_torch_top.png",
+	{name="3d_tprch_torch_on_floor_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	{name="3d_tprch_torch_on_floor_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	{name="3d_torch_torch_right_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	{name="3d_torch_torch_left_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.0}},
+	},
+	inventory_image = "default_torch_on_floor.png",
+	wield_image = "default_torch_on_floor.png",
+	light_source = LIGHT_MAX-1,
+	is_ground_content = false,
+	walkable = false,
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	paramtype = "light",
+	on_place = placeTorch,
 	paramtype2 = "facedir",
-	groups = {oddly_breakable_by_hand = 1}, 
+	groups = {choppy=2,dig_immediate=3,flammable=1,hot=2}, 
+	drop = 'default:torch',
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -74,63 +128,11 @@ minetest.register_node("3d_torch:torch_wall",{
 			{-0.388782,-0.0290134,-0.199956,-0.388782,0.5,0.20914}, --NodeBox14
 			{-0.269826,-0.0290134,-0.197292,-0.269826,0.5,0.205996}, --NodeBox15
 		}
-	}
+	},
+	sounds = default.node_sound_defaults(),
 })
 
-minetest.register_node(":default:torch",{
-	tiles = {
-	"3d_torch_torch_top.png",
-	"3d_torch_torch_top.png",
-	"3d_torch_torch_2.png",
-	"3d_torch_torch.png",
-		{ name="3d_tprch_torch_on_floor_animated.png",
-		animation={
-			type="vertical_frames",
-			aspect_w=40,
-			aspect_h=40,
-			length=1.0
-			}
-		}
-	},
-	inventory_image = "default_torch_on_floor.png",
-	wield_image = "default_torch_on_floor.png",
-	light_source = 30,
-	is_ground_content = true,
-	walkable = false,
-	sunlight_propagates = true,
-	drawtype="nodebox",
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {oddly_breakable_by_hand = 1}, 
-	drop = 'default:torch',
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.0566601,-0.409091,0.402584,0.0447316,-0.362669,0.486083}, --nodebox1
-			{-0.0566601,-0.362669,0.384692,0.0447316,-0.319149,0.471173}, --nodebox2
-			{0.0447316,-0.277336,0.372763,-0.0566601,-0.319085,0.456262}, --nodebox3
-			{-0.0566601,-0.235586,0.357853,0.0447316,-0.277336,0.441352}, --nodebox4
-			{0.0447316,-0.235586,0.342942,-0.0566601,-0.193837,0.429423}, --nodebox5
-			{-0.0566601,-0.193837,0.328032,0.0447316,-0.152087,0.414513}, --nodebox6
-			{-0.0566601,-0.152087,0.310139,0.0447316,-0.110338,0.399602}, --nodebox7
-			{-0.0566601,-0.450298,0.414513,0.0447316,-0.409091,0.5}, --nodebox8
-			{-0.0566601,-0.492048,0.429423,0.0506959,-0.450298,0.5}, --nodebox9
-			{-0.0566601,-0.110338,0.292247,0.0447316,-0.0696325,0.384692}, --nodebox10
-			{-0.0566601,-0.0696325,0.280318,0.0447316,0.0477137,0.366799}, --nodebox11
-			{-0.0566601,-0.0685885,0.119284,-0.0566601,0.5,0.5}, --NodeBox12
-			{0.0447316,-0.0685885,0.119284,0.0447316,0.5,0.5}, --NodeBox13
-			{-0.256461,-0.0685885,0.366799,0.247515,0.5,0.366799}, --NodeBox14
-			{-0.259443,-0.0685885,0.280318,0.250497,0.5,0.280318}, --NodeBox15
-		},
-	},
-	selection_box = {
-		type = "fixed",
-		fixed = {
-		{-0.178926,-0.492048,0.220676,0.172962,0.342942,0.5}, --NodeBox16
-		},
-	},
-})
-
+--3d torch on floor
 minetest.register_node("3d_torch:torch_floor",{
 	tiles = {
 	"3d_torch_torch_top.png",
@@ -147,14 +149,13 @@ minetest.register_node("3d_torch:torch_floor",{
 	
 	inventory_image = "default_torch_on_floor.png",
 	wield_image = "default_torch_on_floor.png",
-	light_source = 30,
-	is_ground_content = true,
+	light_source = LIGHT_MAX-1,
+	is_ground_content = false,
 	walkable = false,
 	sunlight_propagates = true,
 	drawtype="nodebox",
 	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {oddly_breakable_by_hand = 1}, 
+	groups = {choppy=2,dig_immediate=3,flammable=1,hot=2}, 
 	drop = 'default:torch',
 	node_box = {
 		type = "fixed",
@@ -172,47 +173,60 @@ minetest.register_node("3d_torch:torch_floor",{
 		{-0.0696325,-0.5,-0.0638297,0.0638297,0.5,0.0696325}, --NodeBox1
 		},
 	},
+	sounds = default.node_sound_defaults(),
 })
 
-minetest.register_node("3d_torch:torch_ceiling",{
+--abm that converts the already placed torches to the 3d ones
+minetest.register_abm({
+	nodenames = {"default:torch"},
+	interval = 1,
+	chance = 1,
+	action = function(pos, node)
+		local convert_facedir={
+			[2]=2,
+			[3]=0,
+			[4]=1,
+			[5]=3
+			
+		}
+		print(node.param2)
+		if node.param2 == 1 then
+		minetest.swap_node(pos, {name="3d_torch:torch_floor"})
+		elseif node.param2 == 0 then
+		minetest.swap_node(pos, {name="3d_torch:torch_ceiling"})
+		else
+		minetest.swap_node(pos, {name="3d_torch:torch_wall",param2=convert_facedir[node.param2]})
+		end
+	end,
+})
+
+
+--overwrite the default torch to make shure that the torches are placed
+minetest.register_node(":default:torch", {
+	description = "Torch",
+	drawtype = "torchlike",
+	--tiles = {"default_torch_on_floor.png", "default_torch_on_ceiling.png", "default_torch.png"},
 	tiles = {
-	"3d_torch_torch_top.png",
-	"3d_torch_torch_top.png",
-	{ name="3d_tprch_torch_on_floor_animated.png",
-				animation={
-					type="vertical_frames",
-					aspect_w=40,
-					aspect_h=40,
-					length=1.0
-					}
-				}
-			},
-	
+		{name="default_torch_on_floor_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=3.0}},
+		{name="default_torch_on_ceiling_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=3.0}},
+		{name="default_torch_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=3.0}}
+	},
 	inventory_image = "default_torch_on_floor.png",
 	wield_image = "default_torch_on_floor.png",
-	light_source = 30,
-	is_ground_content = true,
-	walkable = false,
-	sunlight_propagates = true,
-	drawtype="nodebox",
 	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {oddly_breakable_by_hand = 1}, 
-	drop = 'default:torch',
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.0696325,-0.5,-0.0638297,0.0638297,0.124758,0.0696325}, --NodeBox1
-			{-0.336557,-0.0667312,0.0698737,0.301741,0.5,0.0698737}, --NodeBox2
-			{-0.336557,-0.0725339,-0.0693932,0.307544,0.5,-0.0693932}, --NodeBox3
-			{0.0522243,-0.0841393,-0.31311,0.0522243,0.5,0.307788}, --NodeBox4
-			{-0.0696325,-0.0783366,-0.318913,-0.0696325,0.5,0.296182}, --NodeBox5
-		},
-	},
+	on_place = placeTorch,
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = false,
+	light_source = LIGHT_MAX-1,
 	selection_box = {
-		type = "fixed",
-		fixed = {
-		{-0.0696325,-0.5,-0.0638297,0.0638297,0.5,0.0696325}, --NodeBox1
-		},
+		type = "wallmounted",
+		wall_top = {-0.1, 0.5-0.6, -0.1, 0.1, 0.5, 0.1},
+		wall_bottom = {-0.1, -0.5, -0.1, 0.1, -0.5+0.6, 0.1},
+		wall_side = {-0.5, -0.3, -0.1, -0.5+0.3, 0.3, 0.1},
 	},
+	groups = {choppy=2,dig_immediate=3,flammable=1,attached_node=1,hot=2},
+	legacy_wallmounted = true,
+	sounds = default.node_sound_defaults(),
 })
