@@ -81,7 +81,7 @@ minetest.register_node("3d_torch:torch_ceiling",{
 	selection_box = {
 		type = "fixed",
 		fixed = {
-		{-0.0696325,-0.5,-0.0638297,0.0638297,0.5,0.0696325}, --NodeBox1
+		{-0.0696325,0.5,-0.0638297,0.0638297,0.1,0.0696325}, --NodeBox1
 		},
 	},
 	sounds = default.node_sound_defaults(),
@@ -129,6 +129,12 @@ minetest.register_node("3d_torch:torch_wall",{
 			{-0.269826,-0.0290134,-0.197292,-0.269826,0.5,0.205996}, --NodeBox15
 		}
 	},
+		selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5,-0.4912921,-0.110013,-0.261122,0.182785,0.11}, --NodeBox1
+		},
+	},
 	sounds = default.node_sound_defaults(),
 })
 
@@ -170,7 +176,7 @@ minetest.register_node("3d_torch:torch_floor",{
 	selection_box = {
 		type = "fixed",
 		fixed = {
-		{-0.0696325,-0.5,-0.0638297,0.0638297,0.5,0.0696325}, --NodeBox1
+		{-0.0696325,-0.5,-0.0638297,0.0638297,0.1,0.0696325}, --NodeBox1
 		},
 	},
 	sounds = default.node_sound_defaults(),
