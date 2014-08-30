@@ -47,7 +47,7 @@ minetest.register_node("3d_torch:torch_ceiling",{
 	tiles = {
 	"3d_torch_torch_top.png",
 	"3d_torch_torch_top.png",
-	{ name="3d_tprch_torch_on_floor_animated.png",
+	{ name="3d_tprch_torch_on_roof_animated.png",
 				animation={
 					type="vertical_frames",
 					aspect_w=40,
@@ -71,17 +71,17 @@ minetest.register_node("3d_torch:torch_ceiling",{
 	node_box = {
 		type = "fixed",
 		fixed = {
-			{-0.0696325,-0.5,-0.0638297,0.0638297,0.124758,0.0696325}, --NodeBox1
-			{-0.336557,-0.0667312,0.0698737,0.301741,0.5,0.0698737}, --NodeBox2
-			{-0.336557,-0.0725339,-0.0693932,0.307544,0.5,-0.0693932}, --NodeBox3
-			{0.0522243,-0.0841393,-0.31311,0.0522243,0.5,0.307788}, --NodeBox4
-			{-0.0696325,-0.0783366,-0.318913,-0.0696325,0.5,0.296182}, --NodeBox5
+			{0.0696325,0.5,0.0638297,-0.0638297,-0.124758,-0.0696325}, --NodeBox1
+			{0.336557,0.0667312,-0.0698737,-0.301741,-0.5,-0.0698737}, --NodeBox2
+			{0.336557,0.0725339,0.0693932,-0.307544,-0.5,0.0693932}, --NodeBox3
+			{-0.0522243,0.0841393,0.31311,-0.0522243,-0.5,-0.307788}, --NodeBox4
+			{0.0696325,0.0783366,0.318913,0.0696325,-0.5,-0.296182}, --NodeBox5
 		},
 	},
 	selection_box = {
 		type = "fixed",
 		fixed = {
-		{-0.0696325,0.5,-0.0638297,0.0638297,0.1,0.0696325}, --NodeBox1
+		{0.0696325,0.5,0.0638297,-0.0638297,-0.124758,-0.0696325}, --NodeBox1
 		},
 	},
 	sounds = default.node_sound_defaults(),
