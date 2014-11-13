@@ -27,6 +27,10 @@ local function placeTorch(itemstack, placer, pointed_thing)
 				[2]=1,
 				[3]=2
 			}
+			if minetest.is_protected(p0, placer:get_player_name()) then
+			  minetest.record_protection_violation(p0, placer:get_player_name())
+			  return
+			end
 			if p0.y>p1.y then
 			--place torch on ceiling
 			minetest.add_node(p1, {name="3d_torch:torch_ceiling"})
