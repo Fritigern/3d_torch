@@ -240,3 +240,7 @@ minetest.register_node(":default:torch", {
 	legacy_wallmounted = true,
 	sounds = default.node_sound_defaults(),
 })
+
+if minetest.setting_get("log_mods") then
+	print("[3d_torch 0.2] loaded")
+end
