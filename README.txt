@@ -23,12 +23,10 @@ CHANGELOG
    Forked by Fritigern
    - Corrected case of default.txt
    - Made 3d_torches safe to use on servers. Mod now respects protected areas.
+   - Mod announces itself if log_mods is enabled in minetest.conf
 
 0.1
-   Initial Release by Infinatum
-
-
-
+   - Initial Release by Infinatum
 
 ====================================================
 
